@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import br.com.spotifycombd.bean.AlbumBean;
+import br.com.spotifycombd.bean.MusicaBean;
 import br.com.spotifycombd.connection.ConnectionFactory;
 import tableModel.CustomTableModel;
 
@@ -98,8 +99,7 @@ public class AlbumDao {
 			
 			while(rs.next()) {
 				
-				albuns.add(new AlbumBean(rs.getInt("idAlbum"), 
-										 rs.getString("nomeAlbum")));
+				albuns.add(getAlbum(rs.getInt("idAlbum")));
 			}
 			
 		} catch (SQLException e) {
@@ -112,7 +112,7 @@ public class AlbumDao {
 		return modelo;
 	}
 
-	public void getAlbum(int id) {
+	public AlbumBean getAlbum(int id) {
 		
 		AlbumBean album = new AlbumBean();
 		
@@ -136,5 +136,36 @@ public class AlbumDao {
 			
 			System.out.println("Erro ao obter informações do álbum.");
 		}
+		
+		
+		ArrayList<MusicaBean> musicas = new ArrayList<>();
+		
+		sql = "select * from mngram where idAlbum = ?";
+		
+		try {
+			
+			PreparedStatement ps = conexao.prepareStatement(sql);
+			
+			ps.setInt(1, id);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while(rs.next()) {
+				
+				MusicaDao md = new MusicaDao();
+				
+				musicas.add(md.getMusica(rs.getInt("idMusica")));
+			}
+			
+			ps.close();
+			
+		} catch (SQLException e) {
+			
+			System.out.println("Erro ao obter músicas do álbum.");
+		}
+		
+		album.set("musicas", musicas);
+		
+		return album;
 	}
 }

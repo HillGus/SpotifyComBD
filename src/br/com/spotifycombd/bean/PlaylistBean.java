@@ -6,7 +6,9 @@ import tableModel.ObjectInfo;
 
 public class PlaylistBean implements ObjectInfo {
 	
+	
 	private HashMap<String, Object> info = new HashMap<>();	
+	
 	
 	public PlaylistBean() {}
 	
@@ -28,6 +30,7 @@ public class PlaylistBean implements ObjectInfo {
 		return (T) info.get(key);
 	}
 
+	
 	@Override
 	public Object[] getInfo() {
 		

@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import br.com.spotifycombd.bean.MusicaBean;
 import br.com.spotifycombd.bean.PlaylistBean;
 import br.com.spotifycombd.connection.ConnectionFactory;
 import tableModel.CustomTableModel;
@@ -98,9 +99,9 @@ public class PlaylistDao {
 			
 			while (rs.next()) {
 				
-				playlists.add(new PlaylistBean(rs.getInt("idPlaylist"),
-											   rs.getString("nomePlaylist")));
+				playlists.add(getPlaylist(rs.getInt("idPlaylist")));
 			}
+			
 		} catch (SQLException e) {
 			
 			System.out.println("Erro ao obter informações do banco.");
@@ -135,6 +136,35 @@ public class PlaylistDao {
 			
 			System.out.println("Erro ao obter informações da playlist.");
 		}
+		
+		
+		ArrayList<MusicaBean> musicas = new ArrayList<MusicaBean>();
+		
+		sql = "select * from mngrplm where idPlaylist = ?";
+		
+		try {
+			
+			PreparedStatement ps = conexao.prepareStatement(sql);
+			
+			ps.setInt(1, id);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				
+				MusicaDao md = new MusicaDao();
+				
+				musicas.add(md.getMusica(rs.getInt("idMusica")));
+			}
+			
+			ps.close();
+			
+		} catch (SQLException e) {
+			
+			System.out.println("Erro ao obter músicas da playlist.");
+		}
+		
+		playlist.set("musicas", musicas);
 		
 		return playlist;
 	}

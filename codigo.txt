@@ -1,0 +1,49 @@
+create spotify;
+use spotify;
+
+CREATE TABLE `Playlist` (
+	`idPlaylist` INT NOT NULL AUTO_INCREMENT,
+	`nomePlaylist` varchar(30) NOT NULL,
+	PRIMARY KEY (`idPlaylist`)
+);
+
+CREATE TABLE `Musica` (
+	`idMusica` INT NOT NULL AUTO_INCREMENT,
+	`nomeMusica` varchar(30) NOT NULL,
+	`idArtista` INT NOT NULL,
+	PRIMARY KEY (`idMusica`)
+);
+
+CREATE TABLE `MngrPLM` (
+	`idPlaylist` INT NOT NULL,
+	`idMusica` INT NOT NULL
+);
+
+CREATE TABLE `Album` (
+	`idAlbum` INT NOT NULL AUTO_INCREMENT,
+	`nomeAlbum` varchar(30) NOT NULL,
+	PRIMARY KEY (`idAlbum`)
+);
+
+CREATE TABLE `mngrAM` (
+	`idAlbum` INT NOT NULL,
+	`idMusica` INT NOT NULL
+);
+
+CREATE TABLE `Usuarios` (
+	`idUsuario` INT NOT NULL AUTO_INCREMENT,
+	`loginUsuario` varchar(30) NOT NULL,
+	`senhaUsuario` varchar(30) NOT NULL,
+	`artista` BOOLEAN NOT NULL DEFAULT false,
+	PRIMARY KEY (`idUsuario`)
+);
+
+ALTER TABLE `Musica` ADD CONSTRAINT `Musica_fk0` FOREIGN KEY (`idArtista`) REFERENCES `Usuarios`(`idUsuario`);
+
+ALTER TABLE `MngrPLM` ADD CONSTRAINT `MngrPLM_fk0` FOREIGN KEY (`idPlaylist`) REFERENCES `Playlist`(`idPlaylist`);
+
+ALTER TABLE `MngrPLM` ADD CONSTRAINT `MngrPLM_fk1` FOREIGN KEY (`idMusica`) REFERENCES `Musica`(`idMusica`);
+
+ALTER TABLE `mngrAM` ADD CONSTRAINT `mngrAM_fk0` FOREIGN KEY (`idAlbum`) REFERENCES `Album`(`idAlbum`);
+
+ALTER TABLE `mngrAM` ADD CONSTRAINT `mngrAM_fk1` FOREIGN KEY (`idMusica`) REFERENCES `Musica`(`idMusica`);
