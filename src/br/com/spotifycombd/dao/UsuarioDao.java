@@ -2,6 +2,7 @@ package br.com.spotifycombd.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import br.com.spotifycombd.bean.UsuarioBean;
@@ -78,5 +79,39 @@ public class UsuarioDao {
 			
 			System.out.println("Erro ao alterar usuário.");
 		}
+	}
+
+	public UsuarioBean getUser(String login) {
+		
+		UsuarioBean user = null;
+		
+		String sql = "select loginUsuario, senhausuario, artista from usuario where loginUsuario = ?";
+		
+		try {
+			
+			PreparedStatement ps = conexao.prepareStatement(sql);
+			
+			ps.setString(1, login);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				
+				user = new UsuarioBean();
+				
+				user.set("loginUsuario", rs.getString("loginUsuario"));
+				user.set("senhaUsuario", rs.getString("senhaUsuario"));
+				user.set("artista", rs.getBoolean("artista"));
+			}
+			
+			ps.close();
+			
+		} catch (SQLException e) {
+			
+			System.out.println("Erro ao obter usuário.");
+			e.printStackTrace();
+		}
+		
+		return user;
 	}
 }

@@ -6,14 +6,20 @@ import java.sql.SQLException;
 
 public class ConnectionFactory {
 
-	private final String url = "jdbc:mysql://localhost:3306/spotifycombd";
+	private final String url = "jdbc:mysql://localhost:3306/spotify";
 	private final String user = "root";
 	private final String password = "";
 	
 	
+	private static Connection conexao = null;
+	
+	
 	public Connection getConnect() {
 		
-		Connection conexao = null;
+		if (conexao != null) {
+			
+			return conexao;
+		}
 		
 		try {
 			
@@ -22,6 +28,7 @@ public class ConnectionFactory {
 		} catch (SQLException e) {
 			
 			System.out.println("Não foi possível criar conexão com o banco de dados.");
+			e.printStackTrace();
 		}
 		
 		return conexao;

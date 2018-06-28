@@ -17,6 +17,11 @@ public class UsuarioBean {
 		info.put("artista", artista);
 	}
 	
+	public UsuarioBean(String login, String senha, boolean artista) {
+		
+		this(0, login, senha, artista);
+	}
+	
 	
 	public void set(String key, Object value) {
 		
