@@ -263,11 +263,11 @@ public class Tela extends JFrame {
 		HPanel pnl = getItensPanel();
 		
 		JScrollPane scrollMusicas = new MusicaDao().getModel().getScroll();
-		scrollMusicas.setBounds(25, 100, 500, 250);
+		scrollMusicas.setBounds(25, 75, 500, 250);
 		
 		pnl.add(scrollMusicas);
 		
-		setSize(550, 375);
+		setSize(566, 389);
 	}
 	
 	private void playlists() {
