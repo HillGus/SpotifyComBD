@@ -154,7 +154,7 @@ public class PlaylistDao {
 				
 				MusicaDao md = new MusicaDao();
 				
-				musicas.add(md.getMusica(rs.getInt("idMusica")));
+				musicas.add(md.getMusicaBy("id", rs.getInt("idMusica")));
 			}
 			
 			ps.close();

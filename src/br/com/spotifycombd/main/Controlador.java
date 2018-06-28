@@ -1,11 +1,14 @@
 package br.com.spotifycombd.main;
 
+import java.util.ArrayList;
+
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import br.com.spotifycombd.bean.UsuarioBean;
+import br.com.spotifycombd.dao.MusicaDao;
 import br.com.spotifycombd.dao.UsuarioDao;
 import br.com.spotifycombd.view.HPanel;
 import br.com.spotifycombd.view.Tela;
@@ -67,5 +70,25 @@ public class Controlador {
 		new UsuarioDao().addUsuario(new UsuarioBean(login, senha, artista));
 		
 		return true;
+	}
+
+
+	public void filtrarMusicas(HPanel pnl) {
+		
+		String userFiltro = ((JTextField) pnl.get("edtFiltro")).getText();
+		
+		String[] filtros = {"^\\w+$", "^\\w+$", "^\\w+$"};
+		
+		ArrayList<Object[]> arrayFiltros = new ArrayList<>();
+		
+		for (String filtro : filtros) {
+		
+			if (userFiltro.matches(filtro)) {
+			
+				arrayFiltros.add(new Object[] {filtro, userFiltro});
+			}
+		}
+		
+		new MusicaDao().getModel(arrayFiltros);
 	}
 }

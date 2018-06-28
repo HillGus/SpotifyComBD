@@ -4,15 +4,19 @@ import java.awt.Font;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import br.com.spotifycombd.bean.PlaylistBean;
 import br.com.spotifycombd.bean.UsuarioBean;
 import br.com.spotifycombd.dao.MusicaDao;
 import br.com.spotifycombd.main.Controlador;
@@ -33,7 +37,7 @@ public class Tela extends JFrame {
 		setLayout(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		login();
+		menu();
 		
 		setVisible(true);
 		setLocationRelativeTo(null);
@@ -262,16 +266,52 @@ public class Tela extends JFrame {
 		
 		HPanel pnl = getItensPanel();
 		
+		JLabel lblFiltro = new JLabel("Filtro");
+		lblFiltro.setBounds(25, 75, 50, 25);
+		lblFiltro.setToolTipText("Filtre por: nome, gênero ou artista");
+		
+		JTextField edtFiltro = new JTextField();
+		edtFiltro.setBounds(75, 75, 450, 25);
+		edtFiltro.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				
+				control.filtrarMusicas(pnl);
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {}
+		});
+		
 		JScrollPane scrollMusicas = new MusicaDao().getModel().getScroll();
-		scrollMusicas.setBounds(25, 75, 500, 250);
+		scrollMusicas.setBounds(25, 125, 500, 250);
 		
 		pnl.add(scrollMusicas);
+		pnl.add(lblFiltro);
+		pnl.add(edtFiltro, "edtFiltro");
 		
 		setSize(566, 389);
 	}
 	
 	private void playlists() {
 		
+		HPanel pnl = getItensPanel();
+		
+		JComboBox<PlaylistBean> cbkPlaylists = new JComboBox<>();
+		cbkPlaylists.setBounds(25, 75, 500, 25);
+		
+		for (PlaylistBean playlist : new MusicaDao().getModel().getObjects()) {
+			
+			cbkPlaylists.add(playlist);
+		}
+		
+				
+		
+		setSize(566, 439);
 	}
 	
 	private void albuns() {

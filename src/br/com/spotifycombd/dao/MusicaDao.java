@@ -15,7 +15,7 @@ public class MusicaDao {
 
 	private Connection conexao;
 	
-	private CustomTableModel<MusicaBean> modelo = new CustomTableModel<>();
+	private static CustomTableModel<MusicaBean> modelo = new CustomTableModel<>();
 	
 	
 	public MusicaDao() {
@@ -119,11 +119,65 @@ public class MusicaDao {
 		return modelo;
 	}
 	
-	public MusicaBean getMusica(int id) {
+	public CustomTableModel<MusicaBean> getModel(ArrayList<Object[]> filtros) {
+		
+		ArrayList<MusicaBean> musicas = new ArrayList<>();
+		
+		String sql = "select * from musica where ";
+		
+		for (Object[] filtro : filtros) {
+			
+			sql += filtro[0] + " like \"%?\"" + (filtros.get(filtros.size() - 1) == filtro ? "" : ", ");
+		}
+		
+		try {
+			
+			PreparedStatement ps = conexao.prepareStatement(sql);
+			
+			for (int i = 0; i < filtros.size(); i++) {
+				
+				ps.setObject(i + 1, filtros.get(i)[1]);
+			}
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				
+				musicas.add(new MusicaBean(
+							
+							rs.getInt("idMusica"),
+							rs.getString("nomeMusica"),
+							rs.getString("duracaoMusica"),
+							rs.getTime("duracaoMusica"),
+							rs.getInt("idArtista")
+						));
+			}
+			
+			ps.close();
+			
+		} catch (SQLException e) {
+			
+			System.out.println("Erro ao obter músicas.");
+			e.printStackTrace();
+		}
+		
+		modelo.setObjects(musicas);
+		
+		return modelo;
+	}
+	
+	public MusicaBean getMusicaBy(String tipo, int id) {
 		
 		MusicaBean musica = new MusicaBean();
 		
-		String sql = "select * from musica where idMusica = ?";
+		String sql = "select musica.* from musica";
+		
+		switch (tipo.toLowerCase()) {
+		
+			case "id": sql += " where idMusica = ?";
+			case "playlist": sql += ", mngrplm where mngrplm.idPlaylist = ?";
+			case "album": sql += ", mngram where mngram.idAlbum = ?";
+		}
 		
 		try {
 			

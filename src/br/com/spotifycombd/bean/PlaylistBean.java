@@ -42,4 +42,11 @@ public class PlaylistBean implements ObjectInfo {
 		
 		return new Object[] {"Código", "Nome"};
 	}
+	
+	
+	@Override
+	public String toString() {
+		
+		return get("nomePlaylist");
+	}
 }
