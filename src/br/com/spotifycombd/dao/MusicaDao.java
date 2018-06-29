@@ -182,10 +182,12 @@ public class MusicaDao {
 			
 			while (rs.next()) {
 				
+				musica.set("idMusica", id);
 				musica.set("nomeMusica", rs.getString("nomeMusica"));
 				musica.set("generoMusica", rs.getString("generoMusica"));
 				musica.set("duracaoMusica", rs.getTime("duracaoMusica"));
 				musica.set("idArtista", rs.getInt("idArtista"));
+				musica.set("nomeArtista", new UsuarioDao().getUser(rs.getInt("idUsuario")).get("loginUsuario"));
 			}
 			
 			ps.close();
@@ -194,6 +196,33 @@ public class MusicaDao {
 			
 			System.out.println("Erro ao obter informaçoes da música.");
 		}
+		
+		return musica;
+	}
+	
+	public MusicaBean getResumedMusica(int id) {
+		
+		MusicaBean musica = new MusicaBean() {
+			
+			public Object[] getInfo() {
+				
+				return new Object[] {get("nomeMusica"), get("nomeArtista")};
+			}
+			
+			public Object[] getInfoName() {
+				
+				return new Object[] {"Nome", "Artista"};
+			}
+		};
+		
+		MusicaBean m = getMusica(id);
+		
+		musica.set("idMusica", m.get("idMusica"));
+		musica.set("nomeMusica", m.get("nomeMusica"));
+		musica.set("generoMusica", m.get("generoMusica"));
+		musica.set("duracaoMusica", m.get("duracaoMusica"));
+		musica.set("idArtista", m.get("idArtista"));
+		musica.set("nomeArtista", m.get("nomeArtista"));
 		
 		return musica;
 	}

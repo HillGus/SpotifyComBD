@@ -36,13 +36,13 @@ public class MusicaBean implements ObjectInfo {
 	@Override
 	public Object[] getInfo() {
 		
-		return new Object[] {get("idMusica"), get("nomeMusica"), get("generoMusica"), getDuracaoString(), get("idArtista")};
+		return new Object[] {get("idMusica"), get("nomeMusica"), get("generoMusica"), getDuracaoString(), get("nomeArtista")};
 	}
 
 	@Override
 	public Object[] getInfoName() {
 		
-		return new Object[] {"Código", "Nome", "Gênero", "Duração", "Artista"};
+		return new Object[] {"CÃ³digo", "Nome", "Genero", "DuraÃ§ao", "Artista"};
 	}
 	
 	

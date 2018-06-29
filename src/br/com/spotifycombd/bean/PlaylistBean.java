@@ -12,10 +12,11 @@ public class PlaylistBean implements ObjectInfo {
 	
 	public PlaylistBean() {}
 	
-	public PlaylistBean(int id, String nome) {
+	public PlaylistBean(int id, String nome, int idUsuario) {
 		
 		info.put("idPlaylist", id);
 		info.put("nomePlaylist", nome);
+		info.put("idUsuario", idUsuario);
 	}
 	
 	
@@ -40,7 +41,7 @@ public class PlaylistBean implements ObjectInfo {
 	@Override
 	public Object[] getInfoName() {
 		
-		return new Object[] {"Código", "Nome"};
+		return new Object[] {"Cï¿½digo", "Nome"};
 	}
 	
 	

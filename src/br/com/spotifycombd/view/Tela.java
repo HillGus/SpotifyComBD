@@ -4,8 +4,11 @@ import java.awt.Font;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -16,6 +19,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import br.com.spotifycombd.bean.MusicaBean;
 import br.com.spotifycombd.bean.PlaylistBean;
 import br.com.spotifycombd.bean.UsuarioBean;
 import br.com.spotifycombd.dao.MusicaDao;
@@ -309,8 +313,19 @@ public class Tela extends JFrame {
 			
 			cbkPlaylists.addItem(playlist);
 		}
-		
+		cbkPlaylists.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
 				
+				new MusicaDao().getModel(((PlaylistBean) cbkPlaylists.getSelectedItem()).get("idPlaylist"));
+			}
+		});
+		
+		JScrollPane scrollMusicas = new MusicaDao().getModel(((PlaylistBean) cbkPlaylists.getSelectedItem()).get("idPlaylist")).getScroll();
+		
+		pnl.add(cbkPlaylists);
+		pnl.add(scrollMusicas);
 		
 		setSize(566, 439);
 	}

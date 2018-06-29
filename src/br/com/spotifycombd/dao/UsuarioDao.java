@@ -36,7 +36,7 @@ public class UsuarioDao {
 			ps.close();
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao cadastrar usuário.");
+			System.out.println("Erro ao cadastrar usuï¿½rio.");
 		}
 	}
 	
@@ -55,7 +55,7 @@ public class UsuarioDao {
 			ps.close();
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao excluir usuário.");
+			System.out.println("Erro ao excluir usuï¿½rio.");
 		}
 	}
 	
@@ -77,7 +77,7 @@ public class UsuarioDao {
 			ps.close();
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao alterar usuário.");
+			System.out.println("Erro ao alterar usuï¿½rio.");
 		}
 	}
 
@@ -99,6 +99,7 @@ public class UsuarioDao {
 				
 				user = new UsuarioBean();
 				
+				user.set("idUsuario", rs.getInt("idUsuario"));
 				user.set("loginUsuario", rs.getString("loginUsuario"));
 				user.set("senhaUsuario", rs.getString("senhaUsuario"));
 				user.set("artista", rs.getBoolean("artista"));
@@ -108,7 +109,42 @@ public class UsuarioDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter usuário.");
+			System.out.println("Erro ao obter usuï¿½rio.");
+			e.printStackTrace();
+		}
+		
+		return user;
+	}
+	
+	public UsuarioBean getUser(int id) {
+		
+		UsuarioBean user = null;
+		
+		String sql = "select loginUsuario, senhausuario, artista from usuario where idUsuario = ?";
+		
+		try {
+			
+			PreparedStatement ps = conexao.prepareStatement(sql);
+			
+			ps.setInt(1, id);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				
+				user = new UsuarioBean();
+				
+				user.set("idUsuario", id);
+				user.set("loginUsuario", rs.getString("loginUsuario"));
+				user.set("senhaUsuario", rs.getString("senhaUsuario"));
+				user.set("artista", rs.getBoolean("artista"));
+			}
+			
+			ps.close();
+			
+		} catch (SQLException e) {
+			
+			System.out.println("Erro ao obter usuï¿½rio.");
 			e.printStackTrace();
 		}
 		

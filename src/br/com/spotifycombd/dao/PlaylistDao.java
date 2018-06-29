@@ -17,6 +17,7 @@ public class PlaylistDao {
 	private Connection conexao;
 	
 	private CustomTableModel<PlaylistBean> modelo = new CustomTableModel<>();
+	private CustomTableModel<MusicaBean> musicModel = new CustomTableModel<>();
 	
 	
 	public PlaylistDao() {
@@ -27,13 +28,14 @@ public class PlaylistDao {
 	
 	public void addPlaylist(PlaylistBean obj) {
 		
-		String sql = "insert into playlist (nomePlaylist) values (?)";
+		String sql = "insert into playlist (nomePlaylist, idUsuario) values (?, ?)";
 		
 		try {
 			
 			PreparedStatement ps = conexao.prepareStatement(sql);
 			
 			ps.setString(1, obj.get("nomePlaylist"));
+			ps.setInt(2, obj.get("idUsuario"));
 			
 			ps.execute();
 			
@@ -64,27 +66,6 @@ public class PlaylistDao {
 		}
 	}
 
-	public void alterarPlaylist(PlaylistBean obj) {
-		
-		String sql = "update playlist set nomePlaylist = ? where idPlaylist = ?";
-	
-		try {
-			
-			PreparedStatement ps = conexao.prepareStatement(sql);
-			
-			ps.setString(1, obj.get("nomePlaylist"));
-			ps.setInt(2, obj.get("idPlaylist"));
-			
-			ps.execute();
-			
-			ps.close();
-			
-		} catch (SQLException e) {
-			
-			System.out.println("Erro ao alterar playlist.");
-		}
-	}
-
 	public CustomTableModel<PlaylistBean> getModel() {
 		
 		ArrayList<PlaylistBean> playlists = new ArrayList<PlaylistBean>();
@@ -104,10 +85,21 @@ public class PlaylistDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter informa��es do banco.");
+			System.out.println("Erro ao obter informaçoes do banco.");
 		}
 		
+		modelo.setObjects(playlists);
+		
 		return modelo;
+	}
+	
+	public CustomTableModel<MusicaBean> getMusicModel(int id) {
+		
+		ArrayList<MusicaBean> musicas = new MusicaDao().getMusicasBy("playlist", id);
+		
+		musicModel.setObjects(musicas);
+		
+		return musicModel;
 	}
 
 	public PlaylistBean getPlaylist(int id) {
@@ -128,13 +120,14 @@ public class PlaylistDao {
 				
 				playlist.set("idPlaylist", rs.getInt("idPlaylist"));
 				playlist.set("nomePlaylist", rs.getString("nomePlaylist"));
+				playlist.set("idUsuario", rs.getInt("idUsuario"));
 			}
 			
 			ps.close();
 	
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter informa��es da playlist.");
+			System.out.println("Erro ao obter informaçoes da playlist.");
 		}
 		
 		
