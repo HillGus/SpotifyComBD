@@ -104,7 +104,7 @@ public class PlaylistDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter informações do banco.");
+			System.out.println("Erro ao obter informaï¿½ï¿½es do banco.");
 		}
 		
 		return modelo;
@@ -134,35 +134,11 @@ public class PlaylistDao {
 	
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter informações da playlist.");
+			System.out.println("Erro ao obter informaï¿½ï¿½es da playlist.");
 		}
 		
 		
-		ArrayList<MusicaBean> musicas = new ArrayList<MusicaBean>();
-		
-		sql = "select * from mngrplm where idPlaylist = ?";
-		
-		try {
-			
-			PreparedStatement ps = conexao.prepareStatement(sql);
-			
-			ps.setInt(1, id);
-			
-			ResultSet rs = ps.executeQuery();
-			
-			while (rs.next()) {
-				
-				MusicaDao md = new MusicaDao();
-				
-				musicas.add(md.getMusicaBy("id", rs.getInt("idMusica")));
-			}
-			
-			ps.close();
-			
-		} catch (SQLException e) {
-			
-			System.out.println("Erro ao obter músicas da playlist.");
-		}
+		ArrayList<MusicaBean> musicas = new MusicaDao().getMusicasBy("playlist", id);
 		
 		playlist.set("musicas", musicas);
 		

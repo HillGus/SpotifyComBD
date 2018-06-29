@@ -19,6 +19,7 @@ import javax.swing.JTextField;
 import br.com.spotifycombd.bean.PlaylistBean;
 import br.com.spotifycombd.bean.UsuarioBean;
 import br.com.spotifycombd.dao.MusicaDao;
+import br.com.spotifycombd.dao.PlaylistDao;
 import br.com.spotifycombd.main.Controlador;
 
 public class Tela extends JFrame {
@@ -37,7 +38,7 @@ public class Tela extends JFrame {
 		setLayout(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		menu();
+		login();
 		
 		setVisible(true);
 		setLocationRelativeTo(null);
@@ -205,7 +206,7 @@ public class Tela extends JFrame {
 		setSize(266, 289);
 		setLocationRelativeTo(null);
 		
-		JButton btnMusicas = new JButton("M˙sicas");
+		JButton btnMusicas = new JButton("M√∫sicas");
 		btnMusicas.setBounds(25, 25, 200, 50);
 		btnMusicas.addActionListener(new ActionListener() {
 			
@@ -227,7 +228,7 @@ public class Tela extends JFrame {
 			}
 		});
 		
-		JButton btnAlbuns = new JButton("¡lbuns");
+		JButton btnAlbuns = new JButton("√Ålbuns");
 		btnAlbuns.setBounds(25, 175, 200, 50);
 		btnAlbuns.addActionListener(new ActionListener() {
 			
@@ -268,7 +269,7 @@ public class Tela extends JFrame {
 		
 		JLabel lblFiltro = new JLabel("Filtro");
 		lblFiltro.setBounds(25, 75, 50, 25);
-		lblFiltro.setToolTipText("Filtre por: nome, gÍnero ou artista");
+		lblFiltro.setToolTipText("Filtre por: nome, genero ou artista");
 		
 		JTextField edtFiltro = new JTextField();
 		edtFiltro.setBounds(75, 75, 450, 25);
@@ -304,9 +305,9 @@ public class Tela extends JFrame {
 		JComboBox<PlaylistBean> cbkPlaylists = new JComboBox<>();
 		cbkPlaylists.setBounds(25, 75, 500, 25);
 		
-		for (PlaylistBean playlist : new MusicaDao().getModel().getObjects()) {
+		for (PlaylistBean playlist : new PlaylistDao().getModel().getObjects()) {
 			
-			cbkPlaylists.add(playlist);
+			cbkPlaylists.addItem(playlist);
 		}
 		
 				

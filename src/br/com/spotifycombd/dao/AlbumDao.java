@@ -41,7 +41,7 @@ public class AlbumDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao cadastrar álbum.");
+			System.out.println("Erro ao cadastrar ï¿½lbum.");
 		}
 	}
 
@@ -60,7 +60,7 @@ public class AlbumDao {
 			ps.close();
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao excluir álbum.");
+			System.out.println("Erro ao excluir ï¿½lbum.");
 		}
 	}
 	
@@ -81,7 +81,7 @@ public class AlbumDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao alterar álbum.");
+			System.out.println("Erro ao alterar ï¿½lbum.");
 		}
 	}
 	
@@ -104,7 +104,7 @@ public class AlbumDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter informações do banco");
+			System.out.println("Erro ao obter informaï¿½ï¿½es do banco");
 		}
 		
 		modelo.setObjects(albuns);
@@ -134,35 +134,11 @@ public class AlbumDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter informações do álbum.");
+			System.out.println("Erro ao obter informaÃ§oes do Ã¡lbum.");
 		}
 		
 		
-		ArrayList<MusicaBean> musicas = new ArrayList<>();
-		
-		sql = "select * from mngram where idAlbum = ?";
-		
-		try {
-			
-			PreparedStatement ps = conexao.prepareStatement(sql);
-			
-			ps.setInt(1, id);
-			
-			ResultSet rs = ps.executeQuery();
-			
-			while(rs.next()) {
-				
-				MusicaDao md = new MusicaDao();
-				
-				musicas.add(md.getMusica(rs.getInt("idMusica")));
-			}
-			
-			ps.close();
-			
-		} catch (SQLException e) {
-			
-			System.out.println("Erro ao obter músicas do álbum.");
-		}
+		ArrayList<MusicaBean> musicas = new MusicaDao().getMusicasBy("album", id);
 		
 		album.set("musicas", musicas);
 		

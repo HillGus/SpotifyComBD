@@ -42,7 +42,7 @@ public class MusicaDao {
 			ps.close();
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao cadastrar música.");
+			System.out.println("Erro ao cadastrar mï¿½sica.");
 		}
 	}
 		
@@ -61,7 +61,7 @@ public class MusicaDao {
 			ps.close();
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao excluir música.");
+			System.out.println("Erro ao excluir mï¿½sica.");
 		}
 	}
 	
@@ -85,7 +85,7 @@ public class MusicaDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao alterar música.");
+			System.out.println("Erro ao alterar mï¿½sica.");
 		}
 	}
 	
@@ -111,7 +111,7 @@ public class MusicaDao {
 			}
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter informações do banco.");
+			System.out.println("Erro ao obter informaï¿½ï¿½es do banco.");
 		}
 		
 		modelo.setObjects(musicas);
@@ -157,7 +157,7 @@ public class MusicaDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter músicas.");
+			System.out.println("Erro ao obter mï¿½sicas.");
 			e.printStackTrace();
 		}
 		
@@ -166,18 +166,11 @@ public class MusicaDao {
 		return modelo;
 	}
 	
-	public MusicaBean getMusicaBy(String tipo, int id) {
+	public MusicaBean getMusica(int id) {
 		
 		MusicaBean musica = new MusicaBean();
 		
-		String sql = "select musica.* from musica";
-		
-		switch (tipo.toLowerCase()) {
-		
-			case "id": sql += " where idMusica = ?";
-			case "playlist": sql += ", mngrplm where mngrplm.idPlaylist = ?";
-			case "album": sql += ", mngram where mngram.idAlbum = ?";
-		}
+		String sql = "select * from musica where idMusica = ?";
 		
 		try {
 			
@@ -199,9 +192,46 @@ public class MusicaDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter informações da música.");
+			System.out.println("Erro ao obter informaÃ§oes da mÃºsica.");
 		}
 		
 		return musica;
+	}
+	
+	public ArrayList<MusicaBean> getMusicasBy(String tipo, int id) {
+		
+		ArrayList<MusicaBean> musicas = new ArrayList<>();
+		
+		String sql = "select musica.* from musica";
+		
+		switch (tipo.toLowerCase()) {
+		
+			case "playlist": sql += ", mngrplm where mngrplm.idPlaylist = ?";
+			case "album": sql += ", mngram where mngram.idAlbum = ?";
+		}
+		
+		try {
+			
+			PreparedStatement ps = conexao.prepareStatement(sql);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				
+				musicas.add(new MusicaBean(
+						
+							rs.getInt("idMusica"),
+							rs.getString("nomeMusica"),
+							rs.getString("generoMusica"),
+							rs.getTime("duracaoMusica"),
+							rs.getInt("idArtista")
+						));
+			}
+		} catch (SQLException e) {
+			
+			System.out.println("Erro ao obter mÃºsicas.");
+		}
+		
+		return musicas;
 	}
 }
