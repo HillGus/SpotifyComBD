@@ -3,6 +3,7 @@ package br.com.spotifycombd.bean;
 import java.sql.Time;
 import java.util.HashMap;
 
+import br.com.spotifycombd.dao.UsuarioDao;
 import tableModel.ObjectInfo;
 
 public class MusicaBean implements ObjectInfo {
@@ -18,6 +19,7 @@ public class MusicaBean implements ObjectInfo {
 		info.put("generoMusica", genero);
 		info.put("duracaoMusica", duracao);
 		info.put("idArtista", idArtista);
+		info.put("nomeArtista", new UsuarioDao().getUser((int) get("idArtista")).get("loginUsuario"));
 	}
 
 	
@@ -36,13 +38,13 @@ public class MusicaBean implements ObjectInfo {
 	@Override
 	public Object[] getInfo() {
 		
-		return new Object[] {get("idMusica"), get("nomeMusica"), get("generoMusica"), getDuracaoString(), get("nomeArtista")};
+		return new Object[] {get("nomeMusica"), get("generoMusica"), getDuracaoString(), get("nomeArtista")};
 	}
 
 	@Override
 	public Object[] getInfoName() {
 		
-		return new Object[] {"CÃ³digo", "Nome", "Genero", "DuraÃ§ao", "Artista"};
+		return new Object[] {"Título", "Genero", "Duração", "Artista"};
 	}
 	
 	

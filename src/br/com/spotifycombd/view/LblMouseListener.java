@@ -3,6 +3,8 @@ package br.com.spotifycombd.view;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import javax.swing.JScrollPane;
+
 public class LblMouseListener implements MouseListener {
 
 	
@@ -11,11 +13,17 @@ public class LblMouseListener implements MouseListener {
 	private int acao;
 	private Runnable run;
 	
+	protected JScrollPane scrollMusicas;
 	
 	public LblMouseListener(int acao, Runnable run) {
 		
 		this.acao = acao;
 		this.run = run;
+	}
+	
+	public LblMouseListener(JScrollPane scrollMusicas) {
+		
+		this.scrollMusicas = scrollMusicas;
 	}
 	
 	

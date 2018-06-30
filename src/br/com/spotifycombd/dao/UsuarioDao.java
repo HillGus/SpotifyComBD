@@ -36,7 +36,7 @@ public class UsuarioDao {
 			ps.close();
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao cadastrar usuï¿½rio.");
+			System.out.println("Erro ao cadastrar usuário.");
 		}
 	}
 	
@@ -55,7 +55,7 @@ public class UsuarioDao {
 			ps.close();
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao excluir usuï¿½rio.");
+			System.out.println("Erro ao excluir usuário.");
 		}
 	}
 	
@@ -85,7 +85,7 @@ public class UsuarioDao {
 		
 		UsuarioBean user = null;
 		
-		String sql = "select loginUsuario, senhausuario, artista from usuario where loginUsuario = ?";
+		String sql = "select * from usuario where loginUsuario = ?";
 		
 		try {
 			
@@ -109,7 +109,7 @@ public class UsuarioDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter usuï¿½rio.");
+			System.out.println("Erro ao obter usuário.");
 			e.printStackTrace();
 		}
 		

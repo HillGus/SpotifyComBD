@@ -12,6 +12,12 @@ public class PlaylistBean implements ObjectInfo {
 	
 	public PlaylistBean() {}
 	
+	public PlaylistBean(String nome, int idUsuario) {
+		
+		info.put("nomePlaylist", nome);
+		info.put("idUsuario", idUsuario);
+	}
+	
 	public PlaylistBean(int id, String nome, int idUsuario) {
 		
 		info.put("idPlaylist", id);

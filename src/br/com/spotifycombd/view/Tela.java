@@ -54,6 +54,11 @@ public class Tela extends JFrame {
 		this.user = user;
 	}
 	
+	public UsuarioBean getUser() {
+		
+		return this.user;
+	}
+	
 	
 	private void login() {
 		
@@ -207,10 +212,10 @@ public class Tela extends JFrame {
 		
 		setTitle("Menu");
 		setContentPane(pnl);
-		setSize(266, 289);
+		setSize(266, 214);
 		setLocationRelativeTo(null);
 		
-		JButton btnMusicas = new JButton("M√∫sicas");
+		JButton btnMusicas = new JButton("M˙sicas");
 		btnMusicas.setBounds(25, 25, 200, 50);
 		btnMusicas.addActionListener(new ActionListener() {
 			
@@ -232,21 +237,10 @@ public class Tela extends JFrame {
 			}
 		});
 		
-		JButton btnAlbuns = new JButton("√Ålbuns");
-		btnAlbuns.setBounds(25, 175, 200, 50);
-		btnAlbuns.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-				albuns();
-			}
-		});
-		
 		if ((boolean) user.get("artista")) {
 			
 			JButton btnArtista = new JButton("Artista");
-			btnArtista.setBounds(25, 250, 200, 50);
+			btnArtista.setBounds(25, 175, 200, 50);
 			btnArtista.addActionListener(new ActionListener() {
 				
 				@Override
@@ -258,46 +252,22 @@ public class Tela extends JFrame {
 			
 			pnl.add(btnArtista);
 			
-			setSize(266, 389);
+			setSize(266, 289);
 			setLocationRelativeTo(null);
 		}
 		
 		pnl.add(btnMusicas);
 		pnl.add(btnPlaylists);
-		pnl.add(btnAlbuns);
 	}
 
 	private void musicas() {
 		
 		HPanel pnl = getItensPanel();
 		
-		JLabel lblFiltro = new JLabel("Filtro");
-		lblFiltro.setBounds(25, 75, 50, 25);
-		lblFiltro.setToolTipText("Filtre por: nome, genero ou artista");
-		
-		JTextField edtFiltro = new JTextField();
-		edtFiltro.setBounds(75, 75, 450, 25);
-		edtFiltro.addKeyListener(new KeyListener() {
-			
-			@Override
-			public void keyTyped(KeyEvent e) {
-				
-				control.filtrarMusicas(pnl);
-			}
-			
-			@Override
-			public void keyReleased(KeyEvent e) {}
-			
-			@Override
-			public void keyPressed(KeyEvent e) {}
-		});
-		
 		JScrollPane scrollMusicas = new MusicaDao().getModel().getScroll();
-		scrollMusicas.setBounds(25, 125, 500, 250);
-		
+		scrollMusicas.setBounds(25, 75, 500, 250);
+	
 		pnl.add(scrollMusicas);
-		pnl.add(lblFiltro);
-		pnl.add(edtFiltro, "edtFiltro");
 		
 		setSize(566, 389);
 	}
@@ -305,33 +275,87 @@ public class Tela extends JFrame {
 	private void playlists() {
 		
 		HPanel pnl = getItensPanel();
+		setSize(566, 489);
+		setLocationRelativeTo(null);
 		
 		JComboBox<PlaylistBean> cbkPlaylists = new JComboBox<>();
-		cbkPlaylists.setBounds(25, 75, 500, 25);
+		cbkPlaylists.setBounds(25, 75, 200, 25);
 		
 		for (PlaylistBean playlist : new PlaylistDao().getModel().getObjects()) {
 			
 			cbkPlaylists.addItem(playlist);
 		}
-		cbkPlaylists.addItemListener(new ItemListener() {
+		
+		JScrollPane scrollMusicas = null;
+		
+		cbkPlaylists.addItemListener(new cbkItemListener(scrollMusicas) {
 			
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
 				
-				new MusicaDao().getModel(((PlaylistBean) cbkPlaylists.getSelectedItem()).get("idPlaylist"));
+				new PlaylistDao().getMusicModel(((PlaylistBean) cbkPlaylists.getSelectedItem()).get("idPlaylist")).getScroll();
+				
+				scrollMusicas = new PlaylistDao().getMusicModel(((PlaylistBean) cbkPlaylists.getSelectedItem()).get("idPlaylist")).getScroll();
+				scrollMusicas.setBounds(25, 125, 500, 250);
 			}
 		});
 		
-		JScrollPane scrollMusicas = new MusicaDao().getModel(((PlaylistBean) cbkPlaylists.getSelectedItem()).get("idPlaylist")).getScroll();
+		try {
+			
+			scrollMusicas = new PlaylistDao().getMusicModel(((PlaylistBean) cbkPlaylists.getSelectedItem()).get("idPlaylist")).getScroll();
+			scrollMusicas.setBounds(25, 125, 500, 250);
+		} catch (Exception e) {}
 		
-		pnl.add(cbkPlaylists);
-		pnl.add(scrollMusicas);
+		JButton btnNovaPlaylist = new JButton("Nova Playlist");
+		btnNovaPlaylist.setBounds(250, 75, 125, 25);
+		btnNovaPlaylist.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				control.addPlaylist(pnl);				
+			}
+		});
 		
-		setSize(566, 439);
-	}
-	
-	private void albuns() {
+		JButton btnRemoverPlaylist = new JButton("Excluir Playlist");
+		btnRemoverPlaylist.setBounds(400, 75, 125, 25);
+		btnRemoverPlaylist.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				control.delPlaylist(pnl);
+			}
+		});
 		
+		JButton btnAdicionarMusica = new JButton("Adicionar M˙sica");
+		btnAdicionarMusica.setBounds(25, 400, 150, 25);
+		btnAdicionarMusica.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				control.addMusicaAtPlaylist(pnl);
+			}
+		});
+		
+		JButton btnRemoverMusica = new JButton("Remover M˙sica");
+		btnRemoverMusica.setBounds(200, 400, 150 , 25);
+		btnRemoverMusica.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				control.delMusicaFromPlaylist(pnl);
+			}
+		});
+		
+		pnl.add(cbkPlaylists, "cbkPlaylists");
+		pnl.add(scrollMusicas, "scrollMusicas");
+		pnl.add(btnNovaPlaylist);
+		pnl.add(btnRemoverPlaylist);
+		pnl.add(btnAdicionarMusica);
+		pnl.add(btnRemoverMusica);
 	}
 	
 	private void artista() {

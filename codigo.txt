@@ -1,22 +1,27 @@
-create spotify;
+create database spotify;
 use spotify;
 
 CREATE TABLE `Playlist` (
 	`idPlaylist` INT NOT NULL AUTO_INCREMENT,
 	`nomePlaylist` varchar(30) NOT NULL,
+	idUsuario int,
 	PRIMARY KEY (`idPlaylist`)
+	foreign key (idUsuario) references usuario (idUsuario)
 );
 
 CREATE TABLE `Musica` (
 	`idMusica` INT NOT NULL AUTO_INCREMENT,
 	`nomeMusica` varchar(30) NOT NULL,
 	`idArtista` INT NOT NULL,
+	generoMusica varchar(30),
+	duracaoMusica Time,
 	PRIMARY KEY (`idMusica`)
 );
 
 CREATE TABLE `MngrPLM` (
 	`idPlaylist` INT NOT NULL,
-	`idMusica` INT NOT NULL
+	`idMusica` INT NOT NULL,
+	idUsuario int not null
 );
 
 CREATE TABLE `Album` (
@@ -30,7 +35,7 @@ CREATE TABLE `mngrAM` (
 	`idMusica` INT NOT NULL
 );
 
-CREATE TABLE `Usuarios` (
+CREATE TABLE `Usuario` (
 	`idUsuario` INT NOT NULL AUTO_INCREMENT,
 	`loginUsuario` varchar(30) NOT NULL,
 	`senhaUsuario` varchar(30) NOT NULL,
@@ -38,7 +43,7 @@ CREATE TABLE `Usuarios` (
 	PRIMARY KEY (`idUsuario`)
 );
 
-ALTER TABLE `Musica` ADD CONSTRAINT `Musica_fk0` FOREIGN KEY (`idArtista`) REFERENCES `Usuarios`(`idUsuario`);
+ALTER TABLE `Musica` ADD CONSTRAINT `Musica_fk0` FOREIGN KEY (`idArtista`) REFERENCES `Usuario`(`idUsuario`);
 
 ALTER TABLE `MngrPLM` ADD CONSTRAINT `MngrPLM_fk0` FOREIGN KEY (`idPlaylist`) REFERENCES `Playlist`(`idPlaylist`);
 
@@ -47,3 +52,5 @@ ALTER TABLE `MngrPLM` ADD CONSTRAINT `MngrPLM_fk1` FOREIGN KEY (`idMusica`) REFE
 ALTER TABLE `mngrAM` ADD CONSTRAINT `mngrAM_fk0` FOREIGN KEY (`idAlbum`) REFERENCES `Album`(`idAlbum`);
 
 ALTER TABLE `mngrAM` ADD CONSTRAINT `mngrAM_fk1` FOREIGN KEY (`idMusica`) REFERENCES `Musica`(`idMusica`);
+
+alter table mngrPLM add constraint foreign key (idUsuario) references Usuario (idUsuario);

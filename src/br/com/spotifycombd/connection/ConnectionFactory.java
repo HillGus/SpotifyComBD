@@ -27,7 +27,7 @@ public class ConnectionFactory {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Nao foi possÃ­vel criar conexao com o banco de dados.\n");
+			System.out.println("Nao foi possível criar conexao com o banco de dados.\n");
 			e.printStackTrace();
 		}
 		

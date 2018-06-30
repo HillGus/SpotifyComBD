@@ -16,6 +16,7 @@ public class MusicaDao {
 	private Connection conexao;
 	
 	private static CustomTableModel<MusicaBean> modelo = new CustomTableModel<>();
+	private static CustomTableModel<MusicaBean> modeloResumido = new CustomTableModel<>();
 	
 	
 	public MusicaDao() {
@@ -42,7 +43,7 @@ public class MusicaDao {
 			ps.close();
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao cadastrar mï¿½sica.");
+			System.out.println("Erro ao cadastrar música.");
 		}
 	}
 		
@@ -61,7 +62,7 @@ public class MusicaDao {
 			ps.close();
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao excluir mï¿½sica.");
+			System.out.println("Erro ao excluir música.");
 		}
 	}
 	
@@ -85,85 +86,22 @@ public class MusicaDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao alterar mï¿½sica.");
+			System.out.println("Erro ao alterar música.");
 		}
 	}
 	
 	public CustomTableModel<MusicaBean> getModel() {
-		
-		ArrayList<MusicaBean> musicas = new ArrayList<MusicaBean>();
-		
-		String sql = "select * from musica";
-		
-		try {
-			
-			Statement st = conexao.createStatement();
-			
-			ResultSet rs = st.executeQuery(sql);
-			
-			while(rs.next()) {
-				
-				musicas.add(new MusicaBean(rs.getInt("idMusica"), 
-							  			   rs.getString("nomeMusica"), 
-							  			   rs.getString("generoMusica"), 
-							  			   rs.getTime("duracaoMusica"), 
-							  			   rs.getInt("idArtista")));
-			}
-		} catch (SQLException e) {
-			
-			System.out.println("Erro ao obter informaï¿½ï¿½es do banco.");
-		}
-		
-		modelo.setObjects(musicas);
+
+		modelo.setObjects(getAllMusica());
 		
 		return modelo;
 	}
 	
-	public CustomTableModel<MusicaBean> getModel(ArrayList<Object[]> filtros) {
+	public CustomTableModel<MusicaBean> getResumedModel() {
 		
-		ArrayList<MusicaBean> musicas = new ArrayList<>();
+		modeloResumido.setObjects(getAllResumedMusica());
 		
-		String sql = "select * from musica where ";
-		
-		for (Object[] filtro : filtros) {
-			
-			sql += filtro[0] + " like \"%?\"" + (filtros.get(filtros.size() - 1) == filtro ? "" : ", ");
-		}
-		
-		try {
-			
-			PreparedStatement ps = conexao.prepareStatement(sql);
-			
-			for (int i = 0; i < filtros.size(); i++) {
-				
-				ps.setObject(i + 1, filtros.get(i)[1]);
-			}
-			
-			ResultSet rs = ps.executeQuery();
-			
-			while (rs.next()) {
-				
-				musicas.add(new MusicaBean(
-							
-							rs.getInt("idMusica"),
-							rs.getString("nomeMusica"),
-							rs.getString("duracaoMusica"),
-							rs.getTime("duracaoMusica"),
-							rs.getInt("idArtista")
-						));
-			}
-			
-			ps.close();
-			
-		} catch (SQLException e) {
-			
-			System.out.println("Erro ao obter mï¿½sicas.");
-			e.printStackTrace();
-		}
-		
-		modelo.setObjects(musicas);
-		
-		return modelo;
+		return modeloResumido;
 	}
 	
 	public MusicaBean getMusica(int id) {
@@ -194,50 +132,17 @@ public class MusicaDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter informaÃ§oes da mÃºsica.");
+			System.out.println("Erro ao obter informaçõoes da música.");
 		}
 		
 		return musica;
 	}
 	
-	public MusicaBean getResumedMusica(int id) {
-		
-		MusicaBean musica = new MusicaBean() {
-			
-			public Object[] getInfo() {
-				
-				return new Object[] {get("nomeMusica"), get("nomeArtista")};
-			}
-			
-			public Object[] getInfoName() {
-				
-				return new Object[] {"Nome", "Artista"};
-			}
-		};
-		
-		MusicaBean m = getMusica(id);
-		
-		musica.set("idMusica", m.get("idMusica"));
-		musica.set("nomeMusica", m.get("nomeMusica"));
-		musica.set("generoMusica", m.get("generoMusica"));
-		musica.set("duracaoMusica", m.get("duracaoMusica"));
-		musica.set("idArtista", m.get("idArtista"));
-		musica.set("nomeArtista", m.get("nomeArtista"));
-		
-		return musica;
-	}
-	
-	public ArrayList<MusicaBean> getMusicasBy(String tipo, int id) {
+	public ArrayList<MusicaBean> getAllMusica() {
 		
 		ArrayList<MusicaBean> musicas = new ArrayList<>();
 		
-		String sql = "select musica.* from musica";
-		
-		switch (tipo.toLowerCase()) {
-		
-			case "playlist": sql += ", mngrplm where mngrplm.idPlaylist = ?";
-			case "album": sql += ", mngram where mngram.idAlbum = ?";
-		}
+		String sql = "select * from musica";
 		
 		try {
 			
@@ -258,7 +163,120 @@ public class MusicaDao {
 			}
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter mÃºsicas.");
+			System.out.println("Erro ao obter músicas.");
+			e.printStackTrace();
+		}
+		
+		return musicas;
+	}
+	
+	public MusicaBean getResumedMusica(int id) {
+		
+		MusicaBean musica = new MusicaBean() {
+			
+			public Object[] getInfo() {
+				
+				return new Object[] {get("nomeMusica"), get("nomeArtista")};
+			}
+			
+			public Object[] getInfoName() {
+				
+				return new Object[] {"Título", "Artista"};
+			}
+		};
+		
+		MusicaBean m = getMusica(id);
+		
+		musica.set("idMusica", m.get("idMusica"));
+		musica.set("nomeMusica", m.get("nomeMusica"));
+		musica.set("generoMusica", m.get("generoMusica"));
+		musica.set("duracaoMusica", m.get("duracaoMusica"));
+		musica.set("idArtista", m.get("idArtista"));
+		musica.set("nomeArtista", m.get("nomeArtista"));
+		
+		return musica;
+	}
+	
+	public ArrayList<MusicaBean> getAllResumedMusica() {
+		
+		ArrayList<MusicaBean> musicas = new ArrayList<>();
+		
+		String sql = "select * from musica";
+		
+		try {
+			
+			PreparedStatement ps = conexao.prepareStatement(sql);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				
+				musicas.add(new MusicaBean(
+						
+							rs.getInt("idMusica"),
+							rs.getString("nomeMusica"),
+							rs.getString("generoMusica"),
+							rs.getTime("duracaoMusica"),
+							rs.getInt("idArtista")
+						) {
+					
+					@Override
+					public Object[] getInfo() {
+						
+						return new Object[] {get("nomeMusica"), get("nomeArtista")};
+					}
+					
+					@Override
+					public Object[] getInfoName() {
+						
+						return new Object[] {"Título", "Artista"};
+					}
+				});
+			}
+		} catch (SQLException e) {
+			
+			System.out.println("Erro ao obter músicas.");
+			e.printStackTrace();
+		}
+		
+		return musicas;
+	}
+	
+	public ArrayList<MusicaBean> getMusicasBy(String tipo, int id) {
+		
+		ArrayList<MusicaBean> musicas = new ArrayList<>();
+		
+		String sql = "select musica.* from musica";
+		
+		switch (tipo.toLowerCase()) {
+		
+			case "playlist": sql += ", mngrplm where mngrplm.idPlaylist = ?";break;
+			case "album": sql += ", mngram where mngram.idAlbum = ?";
+		}
+		
+		try {
+			
+			PreparedStatement ps = conexao.prepareStatement(sql);
+			
+			ps.setInt(1, id);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				
+				musicas.add(new MusicaBean(
+						
+							rs.getInt("idMusica"),
+							rs.getString("nomeMusica"),
+							rs.getString("generoMusica"),
+							rs.getTime("duracaoMusica"),
+							rs.getInt("idArtista")
+						));
+			}
+		} catch (SQLException e) {
+			
+			System.out.println("Erro ao obter músicas.");
+			e.printStackTrace();
 		}
 		
 		return musicas;

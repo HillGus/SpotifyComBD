@@ -16,8 +16,8 @@ public class PlaylistDao {
 
 	private Connection conexao;
 	
-	private CustomTableModel<PlaylistBean> modelo = new CustomTableModel<>();
-	private CustomTableModel<MusicaBean> musicModel = new CustomTableModel<>();
+	private static CustomTableModel<PlaylistBean> modelo = new CustomTableModel<>();
+	private static CustomTableModel<MusicaBean> musicModel = new CustomTableModel<>();
 	
 	
 	public PlaylistDao() {
@@ -44,12 +44,30 @@ public class PlaylistDao {
 		} catch (SQLException e) {
 			
 			System.out.println("Erro ao adicionar playlist.");
+			e.printStackTrace();
 		}
 	}
 
 	public void excluirPlaylist(int id) {
 		
-		String sql = "delete from playlist where idPlaylist = ?";
+		String sql = "delete from mngrplm where idPlaylist = ?";
+		
+		try {
+			
+			PreparedStatement ps = conexao.prepareStatement(sql);
+			
+			ps.setInt(1, id);
+			
+			ps.execute();
+			
+			ps.close();
+		} catch (SQLException e) {
+			
+			System.out.println("Erro ao excluir músicas da playlist.");
+			e.printStackTrace();
+		}
+		
+		sql = "delete from playlist where idPlaylist = ?";
 		
 		try {
 			
@@ -63,9 +81,32 @@ public class PlaylistDao {
 		} catch (SQLException e) {
 			
 			System.out.println("Erro ao excluir playlist.");
+			e.printStackTrace();
 		}
 	}
 
+	public void addMusica(int idMusica, int idPlaylist, int idUsuario) {
+		
+		String sql = "insert into mngrPLM (idMusica, idPlaylist, idUsuario) values (?, ?, ?)";
+		
+		try {
+			
+			PreparedStatement ps = conexao.prepareStatement(sql);
+			
+			ps.setInt(1, idMusica);
+			ps.setInt(2, idPlaylist);
+			ps.setInt(3, idUsuario);
+			
+			ps.execute();
+			
+			ps.close();
+		} catch (SQLException e) {
+			
+			System.out.println("Erro ao adicionar música à playlist.");
+			e.printStackTrace();
+		}
+	}
+	
 	public CustomTableModel<PlaylistBean> getModel() {
 		
 		ArrayList<PlaylistBean> playlists = new ArrayList<PlaylistBean>();
@@ -85,7 +126,7 @@ public class PlaylistDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter informaÃ§oes do banco.");
+			System.out.println("Erro ao obter informações do banco.");
 		}
 		
 		modelo.setObjects(playlists);
@@ -127,13 +168,40 @@ public class PlaylistDao {
 	
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter informaÃ§oes da playlist.");
+			System.out.println("Erro ao obter informações da playlist.");
 		}
 		
 		
 		ArrayList<MusicaBean> musicas = new MusicaDao().getMusicasBy("playlist", id);
 		
 		playlist.set("musicas", musicas);
+		
+		return playlist;
+	}
+
+	public PlaylistBean getLastPlaylist() {
+		
+		PlaylistBean playlist = new PlaylistBean();
+		
+		String sql = "select * from playlist order by idPlaylist desc limit 1";
+		
+		try {
+			
+			Statement st = conexao.createStatement();
+			
+			ResultSet rs = st.executeQuery(sql);
+			
+			playlist.set("idPlaylist", rs.getInt("idPlaylist"));
+			playlist.set("nomePlaylist", rs.getString("nomePlaylist"));
+			playlist.set("idUsuario", rs.getInt("idUsuario"));
+			
+			st.close();
+			
+		} catch (SQLException e) {
+			
+			System.out.println("Não foi possível obter a última playlist.");
+			e.printStackTrace();
+		}
 		
 		return playlist;
 	}
