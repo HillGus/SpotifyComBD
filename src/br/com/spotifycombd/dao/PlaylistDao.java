@@ -7,14 +7,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import javax.swing.JComboBox;
+
 import br.com.spotifycombd.bean.MusicaBean;
 import br.com.spotifycombd.bean.PlaylistBean;
 import br.com.spotifycombd.connection.ConnectionFactory;
+import br.com.spotifycombd.main.Controlador;
 import tableModel.CustomTableModel;
 
 public class PlaylistDao {
 
 	private Connection conexao;
+	
+	private Controlador control = new Controlador();
 	
 	private static CustomTableModel<PlaylistBean> modelo = new CustomTableModel<>();
 	private static CustomTableModel<MusicaBean> musicModel = new CustomTableModel<>();
@@ -63,7 +68,7 @@ public class PlaylistDao {
 			ps.close();
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao excluir músicas da playlist.");
+			System.out.println("Erro ao excluir mï¿½sicas da playlist.");
 			e.printStackTrace();
 		}
 		
@@ -85,6 +90,7 @@ public class PlaylistDao {
 		}
 	}
 
+	//Adiciona uma mÃºsica a uma determinada playlist de um determinado usuÃ¡rio
 	public void addMusica(int idMusica, int idPlaylist, int idUsuario) {
 		
 		String sql = "insert into mngrPLM (idMusica, idPlaylist, idUsuario) values (?, ?, ?)";
@@ -102,16 +108,40 @@ public class PlaylistDao {
 			ps.close();
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao adicionar música à playlist.");
+			System.out.println("Erro ao adicionar mÃºsica Ã  playlist.");
 			e.printStackTrace();
 		}
+	}
+	
+	//Deleta uma mÃºsica de uma determinada playlist
+	public void delMusica(int idMusica, int idPlaylist) {
+		
+		String sql = "delete from mngrPLM where idMusica = ? and idPlaylist = ? limit 1";
+		
+		try {
+			
+			PreparedStatement ps = conexao.prepareStatement(sql);
+		
+		ps.setInt(1, idMusica);
+		ps.setInt(2, idPlaylist);
+		
+		ps.execute();
+		
+		ps.close();
+		} catch (SQLException e) {
+			
+			System.out.println("Erro ao excluir mÃºsica da playlist.");
+			e.printStackTrace();
+		}
+		
+		getMusicModel(idPlaylist);
 	}
 	
 	public CustomTableModel<PlaylistBean> getModel() {
 		
 		ArrayList<PlaylistBean> playlists = new ArrayList<PlaylistBean>();
 	
-		String sql = "select * from playlist";
+		String sql = "select idPlaylist from playlist";
 		
 		try {
 			
@@ -126,7 +156,7 @@ public class PlaylistDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter informações do banco.");
+			System.out.println("Erro ao obter informaÃ§oes do banco.");
 		}
 		
 		modelo.setObjects(playlists);
@@ -134,6 +164,7 @@ public class PlaylistDao {
 		return modelo;
 	}
 	
+	//ObtÃ©m o modelo com as mÃºsicas de uma deterinada playlist
 	public CustomTableModel<MusicaBean> getMusicModel(int id) {
 		
 		ArrayList<MusicaBean> musicas = new MusicaDao().getMusicasBy("playlist", id);
@@ -145,7 +176,7 @@ public class PlaylistDao {
 
 	public PlaylistBean getPlaylist(int id) {
 		
-		PlaylistBean playlist = new PlaylistBean();
+		PlaylistBean playlist = null;
 		
 		String sql = "select * from playlist where idPlaylist = ?";
 		
@@ -159,22 +190,21 @@ public class PlaylistDao {
 			
 			while(rs.next()) {
 				
-				playlist.set("idPlaylist", rs.getInt("idPlaylist"));
-				playlist.set("nomePlaylist", rs.getString("nomePlaylist"));
-				playlist.set("idUsuario", rs.getInt("idUsuario"));
+				playlist = new PlaylistBean(
+								rs.getInt("idPlaylist"),
+								rs.getString("nomePlaylist"),
+								rs.getInt("idUsuario"));
 			}
 			
 			ps.close();
 	
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter informações da playlist.");
+			System.out.println("Erro ao obter informaÃ§oes da playlist.");
 		}
 		
 		
 		ArrayList<MusicaBean> musicas = new MusicaDao().getMusicasBy("playlist", id);
-		
-		playlist.set("musicas", musicas);
 		
 		return playlist;
 	}
@@ -191,15 +221,18 @@ public class PlaylistDao {
 			
 			ResultSet rs = st.executeQuery(sql);
 			
-			playlist.set("idPlaylist", rs.getInt("idPlaylist"));
-			playlist.set("nomePlaylist", rs.getString("nomePlaylist"));
-			playlist.set("idUsuario", rs.getInt("idUsuario"));
+			while (rs.next()) {
+				
+				playlist.set("idPlaylist", rs.getInt("idPlaylist"));
+				playlist.set("nomePlaylist", rs.getString("nomePlaylist"));
+				playlist.set("idUsuario", rs.getInt("idUsuario"));
+			}
 			
 			st.close();
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Não foi possível obter a última playlist.");
+			System.out.println("Nï¿½o foi possï¿½vel obter a ï¿½ltima playlist.");
 			e.printStackTrace();
 		}
 		

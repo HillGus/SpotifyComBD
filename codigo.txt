@@ -6,13 +6,13 @@ CREATE TABLE `Playlist` (
 	`nomePlaylist` varchar(30) NOT NULL,
 	idUsuario int,
 	PRIMARY KEY (`idPlaylist`)
-	foreign key (idUsuario) references usuario (idUsuario)
 );
 
 CREATE TABLE `Musica` (
 	`idMusica` INT NOT NULL AUTO_INCREMENT,
 	`nomeMusica` varchar(30) NOT NULL,
 	`idArtista` INT NOT NULL,
+	idAlbum int,
 	generoMusica varchar(30),
 	duracaoMusica Time,
 	PRIMARY KEY (`idMusica`)
@@ -27,6 +27,7 @@ CREATE TABLE `MngrPLM` (
 CREATE TABLE `Album` (
 	`idAlbum` INT NOT NULL AUTO_INCREMENT,
 	`nomeAlbum` varchar(30) NOT NULL,
+	idUsuario int,
 	PRIMARY KEY (`idAlbum`)
 );
 
@@ -53,4 +54,10 @@ ALTER TABLE `mngrAM` ADD CONSTRAINT `mngrAM_fk0` FOREIGN KEY (`idAlbum`) REFEREN
 
 ALTER TABLE `mngrAM` ADD CONSTRAINT `mngrAM_fk1` FOREIGN KEY (`idMusica`) REFERENCES `Musica`(`idMusica`);
 
+alter table playlist add constraint foreign key (idUsuario) references usuario (idUsuario);
+
 alter table mngrPLM add constraint foreign key (idUsuario) references Usuario (idUsuario);
+
+alter table musica add constraint foreign key (idAlbum) references album (idAlbum);
+
+alter table album add constraint foreign key (idUsuario) references usuario (idUsuario);

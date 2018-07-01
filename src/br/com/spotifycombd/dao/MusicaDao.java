@@ -16,6 +16,7 @@ public class MusicaDao {
 	private Connection conexao;
 	
 	private static CustomTableModel<MusicaBean> modelo = new CustomTableModel<>();
+	private static CustomTableModel<MusicaBean> modeloArtista = new CustomTableModel<>();
 	private static CustomTableModel<MusicaBean> modeloResumido = new CustomTableModel<>();
 	
 	
@@ -27,7 +28,7 @@ public class MusicaDao {
 	
 	public void addMusica(MusicaBean obj) {
 		
-		String sql = "insert into musica (nomeMusica, generoMusica, duracaoMusica, idArtista) values (?, ?, ?, ?)";
+		String sql = "insert into musica (nomeMusica, generoMusica, duracaoMusica, idArtista, idAlbum) values (?, ?, ?, ?, ?)";
 		
 		try {
 			
@@ -37,13 +38,14 @@ public class MusicaDao {
 			ps.setString(2, obj.get("generoMusica"));
 			ps.setTime(3, obj.get("duracaoMusica"));
 			ps.setInt(4, obj.get("idArtista"));
+			ps.setInt(5, obj.get("idAlbum"));
 			
 			ps.execute();
 			
 			ps.close();
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao cadastrar m�sica.");
+			System.out.println("Erro ao cadastrar música.");
 		}
 	}
 		
@@ -62,7 +64,52 @@ public class MusicaDao {
 			ps.close();
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao excluir m�sica.");
+			System.out.println("Erro ao excluir música.");
+		}
+	}
+	
+	public void excluirMusicaByAlbum(int id) {
+		
+		ArrayList<MusicaBean> musicas = new AlbumDao().getMusicModel(id).getObjects();
+		
+		String sql = "delete from mngrplm where idMusica = ?";
+		
+		try {
+			
+			PreparedStatement ps = conexao.prepareStatement(sql);
+			
+			//Remove todas as músicas de um determinado álbum das playlists
+			for (MusicaBean musica : musicas) {
+				
+				ps.setInt(1, musica.get("idMusica"));
+				
+				ps.execute();
+			}
+			
+			ps.close();
+			
+		} catch (SQLException e) {
+			
+			System.out.println("Erro ao remover músicas das playlists.");
+			e.printStackTrace();
+		}
+		
+		//Remove todas as músicas do álbum
+		sql = "delete from musica where idAlbum = ?";
+		
+		try {
+			
+			PreparedStatement ps = conexao.prepareStatement(sql);
+			
+			ps.setInt(1, id);
+			
+			ps.execute();
+			
+			ps.close();
+		} catch (SQLException e) {
+			
+			System.out.println("Erro ao excluir músicas.");
+			e.printStackTrace();
 		}
 	}
 	
@@ -86,7 +133,7 @@ public class MusicaDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao alterar m�sica.");
+			System.out.println("Erro ao alterar música.");
 		}
 	}
 	
@@ -95,6 +142,13 @@ public class MusicaDao {
 		modelo.setObjects(getAllMusica());
 		
 		return modelo;
+	}
+	
+	public CustomTableModel<MusicaBean> getModel(int idArtista) {
+		
+		modeloArtista.setObjects(getAllMusica(idArtista));
+		
+		return modeloArtista;
 	}
 	
 	public CustomTableModel<MusicaBean> getResumedModel() {
@@ -132,7 +186,7 @@ public class MusicaDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter informa��oes da m�sica.");
+			System.out.println("Erro ao obter informaçooes da m�sica.");
 		}
 		
 		return musica;
@@ -158,18 +212,59 @@ public class MusicaDao {
 							rs.getString("nomeMusica"),
 							rs.getString("generoMusica"),
 							rs.getTime("duracaoMusica"),
-							rs.getInt("idArtista")
+							rs.getInt("idArtista"),
+							rs.getInt("idAlbum")
 						));
 			}
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter m�sicas.");
+			System.out.println("Erro ao obter músicas.");
 			e.printStackTrace();
 		}
 		
 		return musicas;
 	}
 	
+	//Retorna todas as músicas de um determinado artista
+	public ArrayList<MusicaBean> getAllMusica(int idUsuario) {
+		
+		ArrayList<MusicaBean> musicas = new ArrayList<>();
+		
+		String sql = "select * from musica where idArtista = ?";
+		
+		try {
+			
+			PreparedStatement ps = conexao.prepareStatement(sql);
+			
+			ps.setInt(1, idUsuario);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				
+				musicas.add(new MusicaBean(
+						
+							rs.getInt("idMusica"),
+							rs.getString("nomeMusica"),
+							rs.getString("generoMusica"),
+							rs.getTime("duracaoMusica"),
+							rs.getInt("idArtista"),
+							rs.getInt("idAlbum")
+						));
+			}
+			
+			ps.close();
+			
+		} catch (SQLException e) {
+			
+			System.out.println("Erro ao obter músicas.");
+			e.printStackTrace();
+		}
+		
+		return musicas;
+	}
+	
+	//Retorna uma música, mas com os métodos usados pelo CustomTableModel sobrescritos para aparecem menos informaçoes na tabela
 	public MusicaBean getResumedMusica(int id) {
 		
 		MusicaBean musica = new MusicaBean() {
@@ -181,7 +276,7 @@ public class MusicaDao {
 			
 			public Object[] getInfoName() {
 				
-				return new Object[] {"T�tulo", "Artista"};
+				return new Object[] {"Título", "Artista"};
 			}
 		};
 		
@@ -217,7 +312,8 @@ public class MusicaDao {
 							rs.getString("nomeMusica"),
 							rs.getString("generoMusica"),
 							rs.getTime("duracaoMusica"),
-							rs.getInt("idArtista")
+							rs.getInt("idArtista"),
+							rs.getInt("idAlbum")
 						) {
 					
 					@Override
@@ -229,19 +325,20 @@ public class MusicaDao {
 					@Override
 					public Object[] getInfoName() {
 						
-						return new Object[] {"T�tulo", "Artista"};
+						return new Object[] {"Título", "Artista"};
 					}
 				});
 			}
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter m�sicas.");
+			System.out.println("Erro ao obter músicas.");
 			e.printStackTrace();
 		}
 		
 		return musicas;
 	}
 	
+	//Obtém todas as músicas de um determinado álbum ou playlist
 	public ArrayList<MusicaBean> getMusicasBy(String tipo, int id) {
 		
 		ArrayList<MusicaBean> musicas = new ArrayList<>();
@@ -250,8 +347,8 @@ public class MusicaDao {
 		
 		switch (tipo.toLowerCase()) {
 		
-			case "playlist": sql += ", mngrplm where mngrplm.idPlaylist = ?";break;
-			case "album": sql += ", mngram where mngram.idAlbum = ?";
+			case "playlist": sql += ", mngrplm where mngrplm.idPlaylist = ? and musica.idMusica = mngrplm.idMusica";break;
+			case "album": sql += " where idAlbum = ?";
 		}
 		
 		try {
@@ -270,12 +367,13 @@ public class MusicaDao {
 							rs.getString("nomeMusica"),
 							rs.getString("generoMusica"),
 							rs.getTime("duracaoMusica"),
-							rs.getInt("idArtista")
+							rs.getInt("idArtista"),
+							rs.getInt("idAlbum")
 						));
 			}
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter m�sicas.");
+			System.out.println("Erro ao obter músicas.");
 			e.printStackTrace();
 		}
 		

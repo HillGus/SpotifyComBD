@@ -11,6 +11,7 @@ public class UsuarioBean {
 	
 	public UsuarioBean(int id, String login, String senha, boolean artista) {
 		
+		//Define as informaçoes no dicionario
 		info.put("idUsuario", id);
 		info.put("loginUsuario", login);
 		info.put("senhaUsuario", senha);

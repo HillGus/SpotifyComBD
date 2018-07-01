@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import javax.swing.JComboBox;
+
 import br.com.spotifycombd.bean.AlbumBean;
 import br.com.spotifycombd.bean.MusicaBean;
 import br.com.spotifycombd.connection.ConnectionFactory;
@@ -16,10 +18,11 @@ public class AlbumDao {
 
 	private Connection conexao;
 	
-	private CustomTableModel<AlbumBean> modelo = new CustomTableModel<>();
+	private static JComboBox<AlbumBean> cbkAlbuns = new JComboBox<>();
+	private static CustomTableModel<MusicaBean> musicModel = new CustomTableModel<>();
 	
 	
-	public AlbumDao() {
+ 	public AlbumDao() {
 		
 		conexao = new ConnectionFactory().getConnect();
 	}
@@ -27,13 +30,14 @@ public class AlbumDao {
 	
 	public void addAlbum(AlbumBean obj) {
 		
-		String sql = "insert into album (nomeAlbum) values (?)";
+		String sql = "insert into album (nomeAlbum, idUsuario) values (?, ?)";
 		
 		try {
 			
 			PreparedStatement ps = conexao.prepareStatement(sql);
 			
 			ps.setString(1, obj.get("nomeAlbum"));
+			ps.setInt(2, obj.get("idUsuario"));
 			
 			ps.execute();
 			
@@ -41,7 +45,7 @@ public class AlbumDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao cadastrar �lbum.");
+			System.out.println("Erro ao cadastrar álbum.");
 		}
 	}
 
@@ -55,12 +59,15 @@ public class AlbumDao {
 			
 			ps.setInt(1, id);
 			
+			new MusicaDao().excluirMusicaByAlbum(id);
+			
 			ps.execute();
 			
 			ps.close();
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao excluir �lbum.");
+			System.out.println("Erro ao excluir álbum.");
+			e.printStackTrace();
 		}
 	}
 	
@@ -81,13 +88,14 @@ public class AlbumDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao alterar �lbum.");
+			System.out.println("Erro ao alterar álbum.");
 		}
 	}
-	
-	public CustomTableModel<AlbumBean> getModel() {
+
+	//Retorna uma comboBox com os objetos dos albuns
+	public JComboBox<AlbumBean> getCombo() {
 		
-		ArrayList<AlbumBean> albuns = new ArrayList<>();
+		cbkAlbuns.removeAllItems();
 		
 		String sql = "select * from album";
 		
@@ -97,24 +105,33 @@ public class AlbumDao {
 			
 			ResultSet rs = st.executeQuery(sql);
 			
-			while(rs.next()) {
+			//Adiciona os albuns na comboBox
+			while (rs.next()) {
 				
-				albuns.add(getAlbum(rs.getInt("idAlbum")));
+				AlbumBean ab = new AlbumBean(
+							rs.getInt("idAlbum"), 
+							rs.getString("nomeAlbum"), 
+							rs.getInt("idUsuario"));
+				
+				
+				
+				cbkAlbuns.addItem(ab);
 			}
+			
+			st.close();
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter informa��es do banco");
+			System.out.println("Erro ao obter álbuns.");
+			e.printStackTrace();
 		}
 		
-		modelo.setObjects(albuns);
-		
-		return modelo;
+		return cbkAlbuns;
 	}
-
+	
 	public AlbumBean getAlbum(int id) {
 		
-		AlbumBean album = new AlbumBean();
+		AlbumBean album = null;
 		
 		String sql = "select * from album where idAlbum = ?";
 		
@@ -128,8 +145,10 @@ public class AlbumDao {
 			
 			while (rs.next()) {
 				
-				album.set("idAlbum", rs.getInt("idAlbum"));
-				album.set("nomeAlbum", rs.getString("nomeAlbum"));
+				album = new AlbumBean(
+						rs.getInt("idAlbum"), 
+						rs.getString("nomeAlbum"),
+						rs.getInt("idUsuario"));
 			}
 			
 		} catch (SQLException e) {
@@ -137,11 +156,74 @@ public class AlbumDao {
 			System.out.println("Erro ao obter informaçoes do álbum.");
 		}
 		
+		return album;
+	}
+
+	public AlbumBean getLastAlbum() {
+		
+		AlbumBean ab = null;
+		
+		String sql = "select * from album order by idAlbum desc limit 1";
+		
+		try {
+			
+			Statement st = conexao.createStatement();
+			
+			ResultSet rs = st.executeQuery(sql);
+			
+			while (rs.next()) {
+				
+				ab = new AlbumBean(
+						rs.getInt("idAlbum"), 
+						rs.getString("nomeUsuario"), 
+						rs.getInt("idUsuario"));
+			}
+			
+			st.close();
+			
+		} catch (SQLException e) {
+			
+			System.out.println("Erro ao obter álbum.");
+			e.printStackTrace();
+		}
+		
+		return ab;
+	}
+
+	public String getNomeAlbum(int id) {
+		
+		String nome = "";
+		
+		String sql = "select nomeAlbum from album where idAlbum = ?";
+		
+		try {
+			
+			PreparedStatement ps = conexao.prepareStatement(sql);
+			
+			ps.setInt(1, id);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				
+				return rs.getString("nomeAlbum");
+			}
+		} catch (SQLException e) {
+			
+			System.out.println("Erro ao obter nome do álbum.");
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	//Retorna o modelo com as músicas do álbum
+	public CustomTableModel<MusicaBean> getMusicModel(int id) {
 		
 		ArrayList<MusicaBean> musicas = new MusicaDao().getMusicasBy("album", id);
 		
-		album.set("musicas", musicas);
+		musicModel.setObjects(musicas);
 		
-		return album;
+		return musicModel;
 	}
 }

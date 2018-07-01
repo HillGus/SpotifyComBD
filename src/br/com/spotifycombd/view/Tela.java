@@ -19,12 +19,16 @@ import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import br.com.spotifycombd.bean.AlbumBean;
 import br.com.spotifycombd.bean.MusicaBean;
 import br.com.spotifycombd.bean.PlaylistBean;
 import br.com.spotifycombd.bean.UsuarioBean;
+import br.com.spotifycombd.dao.AlbumDao;
 import br.com.spotifycombd.dao.MusicaDao;
 import br.com.spotifycombd.dao.PlaylistDao;
 import br.com.spotifycombd.main.Controlador;
+import br.com.spotifycombd.view.componentes.HPanel;
+import br.com.spotifycombd.view.componentes.LblMouseListener;
 
 public class Tela extends JFrame {
 	
@@ -35,28 +39,19 @@ public class Tela extends JFrame {
 	private Font fonteMedia = new Font("Georgean", Font.PLAIN, 15);
 	private Font fontePequena = new Font("Georgean", Font.BOLD, 10);
 	
-	private UsuarioBean user = null;
+	private UsuarioBean user;
+	
 	
 	public Tela() {
 		
+		//Configura a janela
 		setLayout(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		login();
 		
 		setVisible(true);
-		setLocationRelativeTo(null);
-	}
-	
-	
-	public void setUser(UsuarioBean user) {
 		
-		this.user = user;
-	}
-	
-	public UsuarioBean getUser() {
-		
-		return this.user;
 	}
 	
 	
@@ -64,19 +59,25 @@ public class Tela extends JFrame {
 		
 		HPanel pnl = new HPanel();
 		
+		//Confgura a janela
 		setTitle("Login");
 		setSize(265, 200);
+		setLocationRelativeTo(null);
 		setContentPane(pnl);
 		
+		//coordenadas para organizar a tela melhor
 		int coluna1 = 25;
 		int linha1 = 25;
 		
+		//Adicionando componentes
 		JLabel lblLogin = getLabel("Login", fonteMedia);
 		lblLogin.setLocation(coluna1, linha1);
 		
+		//Coordenadas para organizar melhor a tela
 		int coluna2 = coluna1 + lblLogin.getWidth() + 15;
 		int linha2 = linha1 + lblLogin.getHeight() + 15;
 		
+		//Adicionando componentes
 		JLabel lblSenha = getLabel("Senha", fonteMedia);
 		lblSenha.setLocation(coluna1, linha2);
 		
@@ -88,22 +89,24 @@ public class Tela extends JFrame {
 		
 		int linha3 = linha2 + edtLogin.getHeight() + 15;
 		
-		Tela tela = this;
-		
 		JButton btnLogar = new JButton("Entrar");
 		btnLogar.setBounds(80, linha3, 100, 25);
+		
+		//Adicionando listener para validar o usuário
 		btnLogar.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				if (control.validarUsuario(pnl, tela)) {
+				if (control.validarUsuario(pnl)) {
 					
+					user = control.getUser();
 					menu();
 				}
 			}
 		});
 		
+		//Adicionando componentes
 		JLabel lblCadastrar = getLabel("Cadastrar", fontePequena);
 		lblCadastrar.setLocation(132 - lblCadastrar.getWidth() / 2, 125);
 		lblCadastrar.addMouseListener(new LblMouseListener(LblMouseListener.CLICK, new Runnable() {
@@ -130,11 +133,13 @@ public class Tela extends JFrame {
 		
 		HPanel pnl = new HPanel();
 		
+		//Configura janela
 		setTitle("Cadastro");
 		setContentPane(pnl);
 		setSize(300, 265);
 		setLocationRelativeTo(null);
 		
+		//Adiciona componentes
 		int coluna1 = 25;
 		int linha1 = 25;
 		
@@ -168,6 +173,8 @@ public class Tela extends JFrame {
 		
 		JButton btnCadastrar = new JButton("Cadastrar");
 		btnCadastrar.setBounds(150, cbkArtista.getY() + cbkArtista.getHeight() + 15, 100, 25);
+		
+		//Adiciona listener para validar o cadastro e cadastrar o usuário
 		btnCadastrar.addActionListener(new ActionListener() {
 			
 			@Override
@@ -210,12 +217,14 @@ public class Tela extends JFrame {
 		Panel pnl = new Panel();
 		pnl.setLayout(null);
 		
+		//Configura a janela
 		setTitle("Menu");
 		setContentPane(pnl);
 		setSize(266, 214);
 		setLocationRelativeTo(null);
 		
-		JButton btnMusicas = new JButton("M�sicas");
+		//Adicionando componentes e listener para levar às outras janelas
+		JButton btnMusicas = new JButton("Músicas");
 		btnMusicas.setBounds(25, 25, 200, 50);
 		btnMusicas.addActionListener(new ActionListener() {
 			
@@ -270,6 +279,7 @@ public class Tela extends JFrame {
 		pnl.add(scrollMusicas);
 		
 		setSize(566, 389);
+		setLocationRelativeTo(null);
 	}
 	
 	private void playlists() {
@@ -278,34 +288,54 @@ public class Tela extends JFrame {
 		setSize(566, 489);
 		setLocationRelativeTo(null);
 		
+		//Adicionando componentes
 		JComboBox<PlaylistBean> cbkPlaylists = new JComboBox<>();
 		cbkPlaylists.setBounds(25, 75, 200, 25);
 		
+		//Adiciona as playlists ao comboBox
 		for (PlaylistBean playlist : new PlaylistDao().getModel().getObjects()) {
 			
-			cbkPlaylists.addItem(playlist);
+			if (playlist.get("idUsuario") == control.getUser().get("idUsuario")) {
+				
+				cbkPlaylists.addItem(playlist);
+			}
 		}
 		
 		JScrollPane scrollMusicas = null;
 		
-		cbkPlaylists.addItemListener(new cbkItemListener(scrollMusicas) {
+		//Adiciona listener para atualizar o scroll de musicas quando mudar a playlist selecionada
+		cbkPlaylists.addItemListener(new ItemListener() {
 			
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
 				
-				new PlaylistDao().getMusicModel(((PlaylistBean) cbkPlaylists.getSelectedItem()).get("idPlaylist")).getScroll();
-				
-				scrollMusicas = new PlaylistDao().getMusicModel(((PlaylistBean) cbkPlaylists.getSelectedItem()).get("idPlaylist")).getScroll();
-				scrollMusicas.setBounds(25, 125, 500, 250);
+				if (cbkPlaylists.getSelectedItem() != null) {
+					
+					JScrollPane scrollMusicas = pnl.get("scrollMusicas");
+					
+					//Reinicia o scroll
+					scrollMusicas = new PlaylistDao().getMusicModel(((PlaylistBean) cbkPlaylists.getSelectedItem()).get("idPlaylist")).getScroll();
+					scrollMusicas.setBounds(25, 125, 500, 250);
+					
+					pnl.add(scrollMusicas, "scrollMusicas");
+					
+				} else {
+					
+					//Esconde o scroll
+					((JScrollPane) pnl.get("scrollMusicas")).setBounds(0, 0, 0, 0);
+				}
 			}
 		});
 		
+		//Tenta criar o scroll caso tenha alguma playlist selecionada
 		try {
 			
 			scrollMusicas = new PlaylistDao().getMusicModel(((PlaylistBean) cbkPlaylists.getSelectedItem()).get("idPlaylist")).getScroll();
 			scrollMusicas.setBounds(25, 125, 500, 250);
+			pnl.add(scrollMusicas, "scrollMusicas");
 		} catch (Exception e) {}
 		
+		//Adicionando componentes
 		JButton btnNovaPlaylist = new JButton("Nova Playlist");
 		btnNovaPlaylist.setBounds(250, 75, 125, 25);
 		btnNovaPlaylist.addActionListener(new ActionListener() {
@@ -328,7 +358,7 @@ public class Tela extends JFrame {
 			}
 		});
 		
-		JButton btnAdicionarMusica = new JButton("Adicionar M�sica");
+		JButton btnAdicionarMusica = new JButton("Adicionar Música");
 		btnAdicionarMusica.setBounds(25, 400, 150, 25);
 		btnAdicionarMusica.addActionListener(new ActionListener() {
 			
@@ -339,7 +369,7 @@ public class Tela extends JFrame {
 			}
 		});
 		
-		JButton btnRemoverMusica = new JButton("Remover M�sica");
+		JButton btnRemoverMusica = new JButton("Remover Música");
 		btnRemoverMusica.setBounds(200, 400, 150 , 25);
 		btnRemoverMusica.addActionListener(new ActionListener() {
 			
@@ -351,7 +381,6 @@ public class Tela extends JFrame {
 		});
 		
 		pnl.add(cbkPlaylists, "cbkPlaylists");
-		pnl.add(scrollMusicas, "scrollMusicas");
 		pnl.add(btnNovaPlaylist);
 		pnl.add(btnRemoverPlaylist);
 		pnl.add(btnAdicionarMusica);
@@ -360,15 +389,187 @@ public class Tela extends JFrame {
 	
 	private void artista() {
 		
+		HPanel pnl = getItensPanel();
+		
+		setSize(266, 264);
+		setLocationRelativeTo(null);
+		
+		//Adicionando componentes
+		JButton btnAlbuns = new JButton("Álbuns");
+		btnAlbuns.setBounds(25, 75, 200, 50);
+		btnAlbuns.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				albuns();
+			}
+		});
+		
+		JButton btnMusicas = new JButton("Músicas");
+		btnMusicas.setBounds(25, 150, 200, 50);
+		btnMusicas.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				musicasArtista();
+			}
+		});
+		
+		pnl.add(btnMusicas);
+		pnl.add(btnAlbuns);
 	}
 	
-	
-	private HPanel getItensPanel() {
+	private void albuns() {
 		
 		HPanel pnl = new HPanel();
 		
 		setContentPane(pnl);
+		setSize(566, 439);
+		setLocationRelativeTo(null);
+	
+		//Adicionando componentes
+		JButton btnVoltar = new JButton("Voltar");
+		btnVoltar.setBounds(25, 25, 100, 25);
+		btnVoltar.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				artista();
+			}
+		});
 		
+		JScrollPane scrollMusicas = null;
+		
+		JComboBox<AlbumBean> cbkAlbuns = new AlbumDao().getCombo();
+		cbkAlbuns.setBounds(25, 75, 200, 25);
+		
+		//Adicionando listener para quando mudar o album mudar as músicas do scroll
+		cbkAlbuns.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+				
+				try {
+					
+					if (cbkAlbuns.getSelectedItem() != null) {
+						
+						JScrollPane scrollMusicas = pnl.get("scrollMusicas");
+						
+						//Reinicia o scroll
+						scrollMusicas = new AlbumDao().getMusicModel(((AlbumBean) cbkAlbuns.getSelectedItem()).get("idAlbum")).getScroll();
+						scrollMusicas.setBounds(25, 125, 500, 250);
+						
+						pnl.add(scrollMusicas, scrollMusicas);
+					} else {
+	
+						//Esconde o scroll
+						((JScrollPane) pnl.get("scrollMusicas")).setBounds(0, 0, 0, 0);
+					}
+				} catch(Exception e) {}
+			}
+		});
+		
+		//Tenta obter o scroll de músicas caso algum album esteja selecionado
+		try {
+			
+			scrollMusicas = new AlbumDao().getMusicModel(((AlbumBean) cbkAlbuns.getSelectedItem()).get("idAlbum")).getScroll();
+			scrollMusicas.setBounds(25, 125, 500, 250);
+			
+			pnl.add(scrollMusicas, "scrollMusicas");
+		} catch (Exception e) {}
+		
+		//Adicionando componentes
+		JButton btnAdicionar = new JButton("Novo Álbum");
+		btnAdicionar.setBounds(250, 75, 125, 25);
+		btnAdicionar.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				control.addAlbum(pnl);
+			}
+		});
+		
+		JButton btnRemover = new JButton("Excluir Álbum");
+		btnRemover.setBounds(400, 75, 125, 25);
+		btnRemover.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				control.delAlbum(pnl);
+			}
+		});
+		
+		pnl.add(btnVoltar);
+		pnl.add(cbkAlbuns, "cbkAlbuns");
+		pnl.add(btnAdicionar);
+		pnl.add(btnRemover);
+	}
+	
+	private void musicasArtista() {
+		
+		HPanel pnl = new HPanel();
+		
+		setContentPane(pnl);
+		setSize(566, 439);
+		setLocationRelativeTo(null);
+	
+		//Adicionando componentes
+		JButton btnVoltar = new JButton("Voltar");
+		btnVoltar.setBounds(25, 25, 100, 25);
+		btnVoltar.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				artista();
+			}
+		});
+		
+		JScrollPane scrollMusicas = new MusicaDao().getModel(control.getUser().get("idUsuario")).getScroll();
+		scrollMusicas.setBounds(25, 75, 500, 250);
+		
+		JButton btnNovaMusica = new JButton("Nova Música");
+		btnNovaMusica.setBounds(25, 350, 125, 25);
+		btnNovaMusica.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				control.addMusica(pnl);
+			}
+		});
+		
+		JButton btnRemoverMusica = new JButton("Excluir Música");
+		btnRemoverMusica.setBounds(175, 350, 125, 25);
+		btnRemoverMusica.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				control.delMusica(pnl);
+			}
+		});
+		
+		pnl.add(btnVoltar);
+		pnl.add(scrollMusicas, "scrollMusicas");
+		pnl.add(btnRemoverMusica);
+		pnl.add(btnNovaMusica);
+	}
+
+	
+	private HPanel getItensPanel() {
+		
+		//Cria um painel predefinido
+		HPanel pnl = new HPanel();
+		
+		setContentPane(pnl);
+		
+		//Adiciona botao para voltar ao menu principal
 		JButton btnVoltar = new JButton("Voltar");
 		btnVoltar.setBounds(25, 25, 100, 25);
 		btnVoltar.addActionListener(new ActionListener() {
@@ -387,6 +588,7 @@ public class Tela extends JFrame {
 	
 	private JLabel getLabel(String texto, Font fonte) {
 		
+		//Configura uma jlabel com fonte
 		JLabel lbl = new JLabel(texto);
 		lbl.setFont(fonte);
 		lbl.setSize(lbl.getPreferredSize());
@@ -396,6 +598,7 @@ public class Tela extends JFrame {
 	
 	private JTextField getEdit(Font fonte) {
 		
+		//Configura um jtextfield com fonte
 		JTextField edt = new JTextField();
 		edt.setFont(fonte);
 		edt.setSize(edt.getPreferredSize());

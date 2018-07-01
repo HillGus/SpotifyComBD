@@ -1,4 +1,4 @@
-package br.com.spotifycombd.view;
+package br.com.spotifycombd.view.componentes;
 
 import java.awt.Panel;
 import java.util.HashMap;
