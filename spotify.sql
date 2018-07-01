@@ -22,14 +22,14 @@ SET time_zone = "+00:00";
 -- Database: `spotify`
 --
 
+create database spotify; 
+use spotify; 
+
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `album`
 --
-
-create database spotify; 
-use spotify; 
 
 CREATE TABLE `album` (
   `idAlbum` int(11) NOT NULL,
