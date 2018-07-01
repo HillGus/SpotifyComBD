@@ -36,7 +36,7 @@ public class UsuarioDao {
 			ps.close();
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao cadastrar usu·rio.");
+			System.out.println("Erro ao cadastrar usu√°rio.");
 		}
 	}
 	
@@ -55,7 +55,7 @@ public class UsuarioDao {
 			ps.close();
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao excluir usu·rio.");
+			System.out.println("Erro ao excluir usu√°rio.");
 		}
 	}
 	
@@ -109,7 +109,7 @@ public class UsuarioDao {
 			
 		} catch (SQLException e) {
 			
-			System.out.println("Erro ao obter usu·rio.");
+			System.out.println("Erro ao obter usu√°rio.");
 			e.printStackTrace();
 		}
 		
